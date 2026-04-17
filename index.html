@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>信息工程学院 · 文章精选</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Reset & Base ─────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f5f0e8;
+      --surface:   #fffdf8;
+      --border:    #e0d8c8;
+      --accent:    #c0392b;
+      --accent2:   #e8703a;
+      --text:      #1a1510;
+      --muted:     #7a6e62;
+      --tag-bg:    #f0e8d8;
+      --shadow:    0 2px 12px rgba(0,0,0,0.08);
+      --radius:    12px;
+    }
+
+    html { background: var(--bg); }
+
+    body {
+      font-family: 'Noto Serif SC', 'Songti SC', STSong, serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+
+    /* ── Header ───────────────────────────────────── */
+    header {
+      background: var(--text);
+      color: var(--bg);
+      padding: 28px 20px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 20px;
+      background: var(--bg);
+      clip-path: ellipse(55% 100% at 50% 100%);
+    }
+    .header-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--accent2);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: 0.04em;
+    }
+    header h1 span {
+      color: var(--accent2);
+    }
+    .header-sub {
+      margin-top: 6px;
+      font-size: 12px;
+      color: rgba(245,240,232,0.55);
+      font-weight: 400;
+    }
+
+    /* ── Search ───────────────────────────────────── */
+    .search-wrap {
+      padding: 16px 16px 0;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 99px;
+      padding: 0 14px;
+      gap: 8px;
+    }
+    .search-box svg { flex-shrink: 0; opacity: 0.4; }
+    .search-box input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      padding: 10px 0;
+    }
+    .search-box input::placeholder { color: var(--muted); }
+
+    /* ── Year filter ──────────────────────────────── */
+    .filters {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .filters::-webkit-scrollbar { display: none; }
+    .filter-btn {
+      flex-shrink: 0;
+      padding: 5px 14px;
+      border-radius: 99px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      font-size: 12px;
+      font-family: 'DM Mono', monospace;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .filter-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* ── Stats bar ────────────────────────────────── */
+    .stats {
+      padding: 12px 18px 4px;
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      color: var(--muted);
+    }
+
+    /* ── Article list ─────────────────────────────── */
+    #article-list {
+      padding: 4px 12px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ── Card ─────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      transition: transform .18s, box-shadow .18s;
+      position: relative;
+      animation: fadeUp .35s ease both;
+    }
+    .card:active { transform: scale(0.98); box-shadow: none; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Staggered animation */
+    .card:nth-child(1)  { animation-delay: .04s }
+    .card:nth-child(2)  { animation-delay: .08s }
+    .card:nth-child(3)  { animation-delay: .12s }
+    .card:nth-child(4)  { animation-delay: .16s }
+    .card:nth-child(5)  { animation-delay: .20s }
+
+    .card-img-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 7;
+      background: var(--tag-bg);
+      overflow: hidden;
+    }
+    .card-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .4s ease;
+    }
+    .card:active .card-img-wrap img { transform: scale(1.03); }
+
+    /* Placeholder when no image */
+    .card-img-placeholder {
+      width: 100%; height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #ede8df 0%, #ddd5c4 100%);
+    }
+    .card-img-placeholder svg { opacity: 0.25; }
+    .card-img-placeholder span {
+      font-size: 10px;
+      font-family: 'DM Mono', monospace;
+      color: var(--muted);
+      opacity: 0.6;
+    }
+
+    /* Red accent strip on left */
+    .card-body {
+      padding: 12px 14px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-left: 0px solid transparent;
+    }
+    .card:nth-child(odd)  .card-body { border-left-color: var(--accent); }
+    .card:nth-child(even) .card-body { border-left-color: var(--accent2); }
+
+    .card-date {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.5;
+      letter-spacing: 0.02em;
+      color: var(--text);
+    }
+    .card-arrow {
+      align-self: flex-end;
+      margin-top: 2px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--tag-bg);
+      border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ── Empty state ──────────────────────────────── */
+    #empty {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 20px;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    #empty svg { opacity: 0.3; }
+
+    /* ── Footer ───────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 32px 20px 0;
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      color: var(--muted);
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ──────────────────────────────────────── -->
+<header>
+  <div class="header-tag">XuZhiVC · InfoEng</div>
+  <h1>信息工程学院<br/><span>文章精选</span></h1>
+  <div class="header-sub">18 篇推文 · 2019 — 2021</div>
+</header>
+
+<!-- ── Search ──────────────────────────────────────── -->
+<div class="search-wrap">
+  <div class="search-box">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input id="search-input" type="search" placeholder="搜索文章标题…" />
+  </div>
+</div>
+
+<!-- ── Year filters ─────────────────────────────────── -->
+<div class="filters" id="filters">
+  <button class="filter-btn active" data-year="all">全部</button>
+  <button class="filter-btn" data-year="2021">2021</button>
+  <button class="filter-btn" data-year="2020">2020</button>
+  <button class="filter-btn" data-year="2019">2019</button>
+</div>
+
+<!-- ── Stats ────────────────────────────────────────── -->
+<!-- <div class="stats" id="stats">共 18 篇</div> -->
+
+<!-- ── Article list ─────────────────────────────────── -->
+<main id="article-list"></main>
+
+<!-- ── Empty ────────────────────────────────────────── -->
+<div id="empty">
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M9.172 9.172L14.828 14.828M9.172 14.828l5.656-5.656"/>
+    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+  </svg>
+  <span>没有找到相关文章</span>
+</div>
+
+<footer>信息工程学院公众号文章存档</footer>
+
+<script>
+  /* ── 文章数据
+     img: 填入对应图片路径，例如 "covers/article1.jpg"
+     留空则显示占位图
+  ──────────────────────────────────────────────────── */
+  const ARTICLES = [
+    {
+      title: "𝕨𝕖𝕝𝕔𝕠𝕞𝕖 | 信息工程学院欢迎你！",
+      date:  "2021-03-23",
+      url:   "https://mp.weixin.qq.com/s/lDdDauyvvvcol7Tu0YcQRQ",
+      img:   "covers/𝕨𝕖𝕝𝕔𝕠𝕞𝕖___信息工程学院欢迎你！.jpg"   /* ← 替换为: "covers/welcome_信息工程学院欢迎你.jpg" */
+    },
+    {
+      title: "展学子风采，凝聚青春力量，闪耀许职华光",
+      date:  "2020-11-15",
+      url:   "https://mp.weixin.qq.com/s/YvuW1kJ-n-BwcUw4iLj1EQ",
+      img:   "covers/展学子风采，凝聚青春力量，闪耀许职华光.jpg"
+    },
+    {
+      title: "2020级新生入学专业教育 | 信息工程学院拍了拍你",
+      date:  "2020-10-23",
+      url:   "https://mp.weixin.qq.com/s/QrQ8r9p1002Hza_G_YcUzw",
+      img:   "covers/2020级新生入学专业教育___信息工程学院拍了拍你.jpg"
+    },
+    {
+      title: "军训特辑（一）| 乘风破浪，青春飞扬！",
+      date:  "2020-10-20",
+      url:   "https://mp.weixin.qq.com/s/lUJtAoWxvpRWBGfj5I30Ng",
+      img:   "covers/军训特辑（一）__乘风破浪，青春飞扬！.jpg"
+    },
+    {
+      title: "信工院 | '新生活，新辉煌，从这里启航'（内附采访视频）",
+      date:  "2020-10-14",
+      url:   "https://mp.weixin.qq.com/s/5fLnHifPjuyy6Uoagsx4Ew",
+      img:   "covers/信工院___“新生活，新辉煌，从这里启航”(内附采访视频).jpg"
+    },
+    {
+      title: "乘风破浪 青春起航——我校举行2020级新生开学典礼暨军训动员大会",
+      date:  "2020-10-12",
+      url:   "https://mp.weixin.qq.com/s/TNz5Wm2J-YDGG0KrX11RQg",
+      img:   "covers/乘风破浪_青春起航——我校举行2020级新生开学典礼暨军训动员大会.jpg"
+    },
+    {
+      title: "如期而至，一切安好 | 邀请你直击信工学子返校现场",
+      date:  "2020-09-09",
+      url:   "https://mp.weixin.qq.com/s/tiZwnP-3By4DHczB3DHCRA",
+      img:   "covers/如期而至，一切安好_邀请你直击信工学子返校现场.jpg"
+    },
+    {
+      title: "给即将返校学生的一封信",
+      date:  "2020-09-07",
+      url:   "https://mp.weixin.qq.com/s/3r5tQaLhE2FV5X-ZFtFF4Q",
+      img:   "covers/给即将返校学生的一封信.jpg"
+    },
+    {
+      title: "信息学子归，备战专升本",
+      date:  "2020-07-02",
+      url:   "https://mp.weixin.qq.com/s/B6TUNud7T-jpjTqtuoHY8A",
+      img:   "covers/信息学子归，备战专升本.jpg"
+    },
+    {
+      title: "榜样力量 | 信息工程学院优秀毕业生孙淼鑫",
+      date:  "2020-06-30",
+      url:   "https://mp.weixin.qq.com/s/kzlBGWTLRARwlaJ4tdVEhg",
+      img:   "covers/榜样力量___信息工程学院优秀毕业生孙淼鑫.jpg"
+    },
+    {
+      title: "信息工程学院'你与许职的故事'毕业素材征集开始啦",
+      date:  "2020-06-12",
+      url:   "https://mp.weixin.qq.com/s/NBbGihHxYxQDdLzVSWpZow",
+      img:   "covers/信息工程学院“你与许职的故事”毕业素材征集开始啦.jpg"
+    },
+    {
+      title: "终于等到你！信工院第二批学子返校进行时",
+      date:  "2020-06-03",
+      url:   "https://mp.weixin.qq.com/s/Znu2wddL7CdbipxnU3-EfA",
+      img:   "covers/终于等到你！信工院第二批学子返校进行时.jpg"
+    },
+    {
+      title: "开学第一天 | 五月，迎来夏日，迎来你",
+      date:  "2020-05-16",
+      url:   "https://mp.weixin.qq.com/s/cma4LzgrRcrsAT7sHILN4A",
+      img:   "covers/开学第一天___五月，迎来夏日，迎来你.jpg"
+    },
+    {
+      title: "返校首日 | 久别重逢，只因心系校园",
+      date:  "2020-05-13",
+      url:   "https://mp.weixin.qq.com/s/dExCwDHfiC_5-2IDyrZT4A",
+      img:   "covers/返校首日___久别重逢，只因心系校园.jpg"
+    },
+    {
+      title: "你好，重启的武汉！",
+      date:  "2020-04-08",
+      url:   "https://mp.weixin.qq.com/s/Ju50_uA7WlyXgCulPnHWzQ",
+      img:   "covers/你好，重启的武汉！.jpg"
+    },
+    {
+      title: "信息工程学院 | 厚溥IT学院2020年专业招生介绍",
+      date:  "2020-03-18",
+      url:   "https://mp.weixin.qq.com/s/OSKy-8zDiBKr0OxA-9yf4g",
+      img:   "covers/信息工程学院_厚溥IT学院2020年专业招生介绍.jpg"
+    },
+    {
+      title: "再见，2019！你好，2020！",
+      date:  "2019-12-31",
+      url:   "https://mp.weixin.qq.com/s/eCnY_3M8TVBtzaM9bxqGWg",
+      img:   "covers/再见，2019！你好，2020！.jpg"
+    },
+  ];
+
+  /* ── Render ──────────────────────────────────────── */
+  const list    = document.getElementById('article-list');
+  const empty   = document.getElementById('empty');
+  const stats   = document.getElementById('stats');
+  const searchEl= document.getElementById('search-input');
+
+  let currentYear = 'all';
+  let currentQuery = '';
+
+  function render() {
+    const q = currentQuery.trim().toLowerCase();
+    const filtered = ARTICLES.filter(a => {
+      const yearOk  = currentYear === 'all' || a.date.startsWith(currentYear);
+      const queryOk = !q || a.title.toLowerCase().includes(q);
+      return yearOk && queryOk;
+    });
+
+    list.innerHTML = '';
+
+    if (filtered.length === 0) {
+      empty.style.display = 'flex';
+      stats.textContent   = '无结果';
+      return;
+    }
+
+    empty.style.display = 'none';
+    // stats.textContent   = `共 ${filtered.length} 篇`;
+
+    filtered.forEach((art, i) => {
+      const a = document.createElement('a');
+      a.className = 'card';
+      a.href      = art.url;
+      a.target    = '_blank';
+      a.rel       = 'noopener noreferrer';
+      a.style.animationDelay = `${Math.min(i, 7) * 0.05}s`;
+
+      const imgHtml = art.img
+        ? `<img src="${art.img}" alt="${art.title}" loading="lazy" />`
+        : `<div class="card-img-placeholder">
+             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+               <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+               <polyline points="21 15 16 10 5 21"/>
+             </svg>
+             <span>暂无封面图</span>
+           </div>`;
+
+      a.innerHTML = `
+        <div class="card-img-wrap">${imgHtml}</div>
+        <div class="card-body">
+          <span class="card-title">${art.title}</span>
+          <span class="card-arrow">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </span>
+        </div>`;
+
+      list.appendChild(a);
+    });
+  }
+
+  /* ── Filter buttons ──────────────────────────────── */
+  document.getElementById('filters').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentYear = btn.dataset.year;
+    render();
+  });
+
+  /* ── Search input ────────────────────────────────── */
+  let searchTimer;
+  searchEl.addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      currentQuery = searchEl.value;
+      render();
+    }, 200);
+  });
+
+  /* ── Init ────────────────────────────────────────── */
+  render();
+</script>
+</body>
+</html>
